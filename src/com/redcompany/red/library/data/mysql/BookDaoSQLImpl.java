@@ -12,9 +12,16 @@ public class BookDaoSQLImpl implements DBCommand {
 
     private Library library;
 
+    private String standart_db = "jdbc:mysql://localhost:3306/mysql" +
+            "?verifyServerCertificate=false" +
+            "&useSSL=false" +
+            "&requireSSL=false" +
+            "&useLegacyDatetimeCode=false" +
+            "&amp" +
+            "&serverTimezone=UTC";
     // CHANGE PARAMS!
     private static final String DB_URL =
-            "jdbc:mysql://localhost:3306/red_db" +
+            "jdbc:mysql://localhost:3306/library_db" +
                     "?verifyServerCertificate=false" +
                     "&useSSL=false" +
                     "&requireSSL=false" +
@@ -24,7 +31,6 @@ public class BookDaoSQLImpl implements DBCommand {
     ;
     private static final String DB_USER = "red";
     private static final String DB_PASS = "root";
-
 
     public BookDaoSQLImpl() {
         initBD();
@@ -36,9 +42,7 @@ public class BookDaoSQLImpl implements DBCommand {
         List<Book> bookList = new ArrayList<Book>();
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS)) {
             Statement st = connection.createStatement();
-
             ResultSet rs = st.executeQuery("SELECT * FROM book");
-
             while (rs.next() == true) {
                 int id = rs.getInt("id");
                 String title = rs.getString("title");
@@ -46,35 +50,32 @@ public class BookDaoSQLImpl implements DBCommand {
                 bookList.add(book);
                 System.out.println("id: " + id + ", " + "title" + title);
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return library;
     }
 
 
     private void initBD() {
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS)) {
-            Statement stmt = connection.createStatement();
-         //   ResultSet rs = st.executeQuery("SELECT * FROM library_db");
-            if (testDB() == false) {
+        if (testDB() == false) {
+            try (Connection connection = DriverManager.getConnection(standart_db, DB_USER, DB_PASS)) {
+                Statement stmt = connection.createStatement();
                 if (fillDBDefaultValues(stmt) == true) {
                     System.out.println("Database was successfully initialized");
-                }else {
-                    System.out.println("Exception! Database (MYSQL) was not initialized!");
-                    System.out.println("Working with it may lead to an error!");
                 }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }else {
+            System.out.println("Database was created earlier");
         }
+
+
     }
 
     // fill standart values
     private boolean fillDBDefaultValues(Statement stmt ) {
-
         String sql;
         try {
             sql="CREATE DATABASE library_db; ";
@@ -89,7 +90,6 @@ public class BookDaoSQLImpl implements DBCommand {
             stmt.execute(sql);
             sql="INSERT INTO `library_db`.`mylibrary` (`catalog_authors`) VALUES ('Vasya Vasiliev');";
             stmt.execute(sql);
-
             sql="CREATE TABLE catalog_books(id INT PRIMARY KEY AUTO_INCREMENT,book_title varchar(40) NOT NULL, auth_id INT , FOREIGN KEY  (auth_id) REFERENCES mylibrary(id));";
             stmt.execute(sql);
             System.out.println();
@@ -111,23 +111,17 @@ public class BookDaoSQLImpl implements DBCommand {
             stmt.execute(sql);
             sql="INSERT INTO `library_db`.`catalog_books` (`book_title`, `auth_id`) VALUES ('A3_BOOK_3',3);";
             stmt.execute(sql);
-//            stmt.execute(sql);
-//            sql="INSERT INTO namesRanking (name, rating) VALUES ('Nikolaj',12344);";
-//            stmt.execute(sql);
-//            sql="INSERT INTO namesRanking (name, rating) VALUES ('Dmitrij', 12234);";
-//            stmt.execute(sql);
         } catch (SQLException e) {
             System.err.println("Error FILL DB !!!!");
             e.printStackTrace();
         }
-
-        return false;
+        return true;
     }
 
     // поиск БД по названию
     private boolean testDB() {
         String dbNameFind = "library_db";
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS)) {
+        try (Connection connection = DriverManager.getConnection(standart_db, DB_USER, DB_PASS)) {
             Statement st = connection.createStatement();
             ResultSet resultSet = connection.getMetaData().getCatalogs();
             while (resultSet.next()) {
