@@ -35,6 +35,10 @@ public class Library {
         return catalogList;
     }
 
+    public Library createNewLibrary() {
+        return new Library();
+    }
+
     public void setCatalogList(List<Catalog> catalogList) {
         this.catalogList = catalogList;
     }

@@ -1,16 +1,16 @@
 package com.redcompany.red.library.data.mysql;
 
 import com.redcompany.red.library.entity.Book;
+import com.redcompany.red.library.entity.Catalog;
 import com.redcompany.red.library.entity.Library;
 import org.junit.Test;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class BookDaoSQLImpl implements DBCommand {
-
-    private Library library;
 
     private String standart_db = "jdbc:mysql://localhost:3306/mysql" +
             "?verifyServerCertificate=false" +
@@ -39,21 +39,40 @@ public class BookDaoSQLImpl implements DBCommand {
     @Override
     public Library getLibrary() {
 
-        List<Book> bookList = new ArrayList<Book>();
+        Library showLibrary = new Library();
+        List<Catalog> catalogList = new ArrayList<>();
+
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS)) {
             Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM book");
+            ResultSet rs = st.executeQuery("SELECT * FROM mylibrary;");
             while (rs.next() == true) {
-                int id = rs.getInt("id");
-                String title = rs.getString("title");
-                Book book = new Book(id, title);
-                bookList.add(book);
-                System.out.println("id: " + id + ", " + "title" + title);
+                Catalog catalog = new Catalog();
+                String author_name = rs.getString("catalog_authors");
+                catalog.setResponsiblePerson(author_name);
+                catalog.setCreationData(new Date());
+                catalogList.add(catalog);
+            }
+            rs.close();
+
+            int author_size = showLibrary.getCatalogList().size();
+
+            List<Book> bookList = new ArrayList<Book>();
+            for (int i = 0; i < author_size; i++) {
+                ResultSet rs2 = st.executeQuery("SELECT book_title FROM catalog_books\n" +
+                        "WHERE auth_id ="+i+";");
+                while (rs.next() == true) {
+                    int id_book = rs2.getInt("id");
+                    String title = rs2.getString("book_title");
+                    Book book = new Book(id_book, title);
+                    bookList.add(book);
+                }
+                rs2.close();
+                showLibrary.getCatalogList().get(i).setBooks(bookList);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return library;
+        return showLibrary;
     }
 
 
