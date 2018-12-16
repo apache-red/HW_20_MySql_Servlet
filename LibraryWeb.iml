@@ -12,7 +12,9 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
+  <component name="NewModuleRootManager">
+    <output url="file://P:/java_library/apache-tomcat-9.0.13/apache-tomcat-9.0.13/webapps/LibraryWeb" />
+    <output-test url="file://$MODULE_DIR$/out/test/LibraryWeb" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
