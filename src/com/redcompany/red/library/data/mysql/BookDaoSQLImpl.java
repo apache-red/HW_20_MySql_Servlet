@@ -33,25 +33,34 @@ public class BookDaoSQLImpl implements DBCommand {
     private static final String DB_PASS = "root";
 
     public BookDaoSQLImpl() {
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+
         initBD();
+
+        } catch (ClassNotFoundException e1) {
+            e1.printStackTrace();
+        }
     }
 
     @Override
     public Library getLibrary() {
-
         Library libraryDB = new Library();
         List<Catalog> catalogList = libraryDB.createNewCatalogList();
 
+
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS)) {
             Statement st = connection.createStatement();
-
             collectCatalogsFromRS(st, catalogList);
             collectBooksFromRS(st, catalogList);
-
-
+            System.out.println();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+
+
         return libraryDB;
     }
 
@@ -69,7 +78,6 @@ public class BookDaoSQLImpl implements DBCommand {
     }
 
     private void collectBooksFromRS(Statement st, List<Catalog> catalogList) throws SQLException {
-
         for (int i = 0; i <catalogList.size(); i++) {
             Catalog catalog = catalogList.get(i);
             List<Book> bookList= new ArrayList<>();
@@ -84,8 +92,6 @@ public class BookDaoSQLImpl implements DBCommand {
             }
             catalog.setBooks(bookList);
         }
-
-
     }
 
 

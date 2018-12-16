@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/LibraryWeb")
+@WebServlet("/ServletLibrary")
 public class ServletLibrary  extends HttpServlet {
 
         public ServletLibrary() {
@@ -21,15 +21,9 @@ public class ServletLibrary  extends HttpServlet {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            System.out.println("doGet");
-
             String action = req.getParameter("action");
-
             System.out.println("action: " + action);
-            System.out.println(req.getHeader("User-Agent"));
-
             if(action!=null){
-
                 BasicCommandWeb basicCommandWeb = CommandManagerWeb.defineAction(action);
                 basicCommandWeb.performAction(req, resp);
             }

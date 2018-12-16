@@ -17,10 +17,10 @@ public class TwoActionImpl implements BasicCommandWeb {
 	public void performAction(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
 
-		dbService = new RegularDBServiceImpl();
-
-		
-		System.out.println("two perf");	
+//		dbService = new RegularDBServiceImpl();
+//
+//
+//		System.out.println("two perf");
 //		resp.getWriter().println(books);
 	}
 
